@@ -1,0 +1,18 @@
+<resources>
+    <string name="app_name">cmproject</string>
+    <string name="title_activity_maps">Map</string>
+
+    <string name="name">Họ Tên: </string>
+    <string name="license">Biển số: </string>
+    <string name="type">Loại xe: </string>
+    <string name="locaiton">Vị trí: </string>
+    <string name="button_text_xac_nhan">Xác nhận </string>
+    <string name="lbl_create_account"></string>
+    <string name="login">login</string>
+    <string name="phone">PHONE</string>
+    <string name="name_app">Smart Driving Assistance System</string>
+    <string name="success">Successed</string>
+    <string name="sign_in">new user, wait for setting up</string>
+    <string name="check_connect">Check Your Connection</string>
+    <string name="phone_empty">Phone do not empty</string>
+</resources>
