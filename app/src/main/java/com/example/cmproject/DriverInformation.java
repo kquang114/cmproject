@@ -55,26 +55,11 @@ public class DriverInformation extends AppCompatActivity {
         btnTest = findViewById(R.id.btnTest);
     }
 
-//    private void PostInformation(){
-//        final String hoTen = editHoTen.getText().toString();
-//        final String bienSo = editBienSo.getText().toString();
-//        final String loaiXe = editLoai.getText().toString();
-//        final String viTri = editViTri.getText().toString();
-//        btnXacNhan.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                if(hoTen.length() > 0 && bienSo.length() > 0 && loaiXe.length() > 0 && viTri.length() >0){
-//                    RequestQueue requestQueue = Volley.newRequestQueue(MainActivity.this);
-//                    StringRequest stringRequest = new StringRequest(Request.Method.PUT, Server.UrlPostDriver, new Response.Listener<String>() {
-//                        @Override
-//                        public void onResponse(String response) {
-//                            if(response.equals("duplicate!!")){
-//
-//                            }
-//                        }
-//                    })
-//                }
-//            }
-//        });
-//    }
+    private void PostInformation(){
+        final String hoTen = editHoTen.getText().toString();
+        final String bienSo = editBienSo.getText().toString();
+        final String loaiXe = editLoai.getText().toString();
+        final String viTri = editViTri.getText().toString();
+
+    }
 }

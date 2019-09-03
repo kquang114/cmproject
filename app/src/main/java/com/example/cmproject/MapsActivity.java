@@ -12,7 +12,6 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.RequestQueue;
@@ -20,12 +19,10 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.Volley;
-import com.example.cmproject.Model.Driver;
-import com.example.cmproject.Utils.DirectionFinder;
 import com.example.cmproject.Utils.DirectionFinderListener;
 import com.example.cmproject.Utils.Route;
 import com.example.cmproject.Utils.Server;
-import com.google.android.gms.common.internal.service.Common;
+import com.example.cmproject.Utils.SessionManager;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -58,6 +55,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     Location myLocation;
     Button btnParking, btnMyLocation,btnFind,btnDrivers;
 
+    SessionManager sessionManager;
     private List<Marker> originMarkers = new ArrayList<>();
     private List<Marker> destinationMarkers = new ArrayList<>();
     private List<Polyline> polylinePaths = new ArrayList<>();
@@ -72,11 +70,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         setContentView(R.layout.activity_maps);
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 
+        sessionManager = new SessionManager(this);
       if(initMap()){
           Toast.makeText(this,"ready to map",Toast.LENGTH_SHORT).show();
       }
       else{
-          Toast.makeText(this,"map not available!",Toast.LENGTH_SHORT).show();
+
       }
     }
 
@@ -170,7 +169,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                             Marker marker = mMap.addMarker(new MarkerOptions()
                                     .position(latLng)
                                     .title(name)
-                                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE))
+                                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.automobile))
                                     .snippet(license));
                             marker.showInfoWindow();
                             mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
@@ -208,9 +207,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                             LatLng latLng = new LatLng(lat,lng);
                             Marker marker = mMap.addMarker(new MarkerOptions()
                                     .position(latLng)
-                                    .title(name)
-                                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE))
-                                    .snippet(String.valueOf(price)));
+                                    .title(String.valueOf(price)+"$")
+                                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.icon_park))
+                                    .snippet(name));
                             marker.showInfoWindow();
                             mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
                             mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng,8.0f));;

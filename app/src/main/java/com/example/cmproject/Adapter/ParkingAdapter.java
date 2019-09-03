@@ -67,7 +67,7 @@ public class ParkingAdapter  extends BaseAdapter {
         viewHolder.txtId.setText("id = " + parking.getId());
         viewHolder.txtName.setText(parking.getName());
         viewHolder.txtAddress.setText(parking.getAddress());
-        viewHolder.txtPrice.setText(""+parking.getPrice());
+        viewHolder.txtPrice.setText(parking.getPrice() + "$");
 //        DecimalFormat df = new DecimalFormat("##,######");
 //        viewHolder.txtLatitude.setText(df.format(parking.getLatitude())+"");
 //        viewHolder.txtLongtitude.setText(df.format(parking.getLng())+"");

@@ -8,15 +8,20 @@ import android.widget.Button;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.cmproject.Firebaseotp.LogIn;
+import com.example.cmproject.Utils.SessionManager;
 
 
 public class MainActivity extends AppCompatActivity {
 
-    Button btnXacNhan,btnTest;
+    SessionManager sessionManager;
+    Button btnXacNhan;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        sessionManager = new SessionManager(this);
+
+        sessionManager.setLoginState(false);
 
         findId();
         btnXacNhan.setOnClickListener(new View.OnClickListener() {
@@ -27,21 +32,12 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        btnTest.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(MainActivity.this,TestDbActivity.class);
-                startActivity(intent);
-            }
-        });
 
     }
 
     private void findId(){
 
         btnXacNhan = findViewById(R.id.btnLogIn);
-        btnTest = findViewById(R.id.btnTest);
-
     }
 
 //    private void PostInformation(){
