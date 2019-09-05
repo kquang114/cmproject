@@ -5,7 +5,7 @@
     <color name="colorAccent">#FF4081</color>
 
     <color name="placeholder_bg">#DDDDDD</color>
-    <color name="active_dots">#FFFFFF</color>
+    <color name="white">#FFFFFF</color>
     <color name="colorTextView">@android:color/black</color>
     <color name="colorToolbar">@android:color/holo_blue_light</color>
     <color name="colorViewAll">#CC99FF</color>

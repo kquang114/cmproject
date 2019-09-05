@@ -74,7 +74,7 @@ public class SignIn extends AppCompatActivity {
                     public void run() {
                         XuLyDangNhap();
                     }
-                },5000);
+                },1000);
     }
     //test parse string object to json
     public void toJSon() {

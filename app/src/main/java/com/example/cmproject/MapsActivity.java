@@ -12,6 +12,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.android.volley.RequestQueue;
@@ -19,6 +20,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.Volley;
+import com.example.cmproject.Utils.DirectionFinder;
 import com.example.cmproject.Utils.DirectionFinderListener;
 import com.example.cmproject.Utils.Route;
 import com.example.cmproject.Utils.Server;
@@ -37,11 +39,13 @@ import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.bottomsheet.BottomSheetBehavior;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -63,6 +67,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private ProgressDialog progressDialog;
 
     ArrayList<LatLng> lists;
+    private BottomSheetBehavior bottomSheetBehavior;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,14 +76,18 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 
         sessionManager = new SessionManager(this);
-      if(initMap()){
+
+        if(initMap()){
           Toast.makeText(this,"ready to map",Toast.LENGTH_SHORT).show();
       }
-      else{
-
-      }
+        sendRequest();
+        View nestedScrollView = findViewById(R.id.nestedScrollView);
+        bottomSheetBehavior = BottomSheetBehavior.from(nestedScrollView);
     }
 
+    private void sendRequest() {
+        new DirectionFinder(this, "My location","Parking location");
+    }
     private boolean initMap() {
         if(mMap == null){
             SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
@@ -116,13 +125,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         btnDrivers = findViewById(R.id.btnDrivers);
         btnParking = findViewById(R.id.btnParkings);
         btnMyLocation = findViewById(R.id.btnmyLocation);
-        btnFind = findViewById(R.id.btnFind);
-        btnFind.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                polyline();
-            }
-        });
+//
+
         btnMyLocation.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -303,7 +307,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     .title(route.startAddress)
                     .position(route.startLocation)));
             destinationMarkers.add(mMap.addMarker(new MarkerOptions()
-                    .icon(BitmapDescriptorFactory.defaultMarker())
+                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE))
                     .title(route.endAddress)
                     .position(route.endLocation)));
 
