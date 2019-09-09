@@ -1,30 +1,40 @@
 package com.example.cmproject;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.FragmentActivity;
 
 import android.Manifest;
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.location.Location;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.widget.Button;
+
+import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.Toolbar;
 
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.Volley;
+import com.example.cmproject.Model.Parking;
 import com.example.cmproject.Utils.DirectionFinder;
 import com.example.cmproject.Utils.DirectionFinderListener;
 import com.example.cmproject.Utils.Route;
 import com.example.cmproject.Utils.Server;
 import com.example.cmproject.Utils.SessionManager;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -40,6 +50,7 @@ import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -51,13 +62,25 @@ import java.util.List;
 
 import static java.lang.String.valueOf;
 
-public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, DirectionFinderListener {
+public class MapsActivity extends FragmentActivity implements OnMapReadyCallback,
+        DirectionFinderListener,
+        GoogleApiClient.ConnectionCallbacks,
+        GoogleApiClient.OnConnectionFailedListener,
+        GoogleMap.OnMarkerDragListener,
+        GoogleMap.OnMapLongClickListener {
 
+    Parking parking;
     private GoogleMap mMap;
     private FusedLocationProviderClient mFusedLocationClient;
+    GoogleApiClient mGoogleApiClient;
+    FloatingActionButton floatingActionButton;
+    private BottomSheetBehavior bottomSheetBehavior;
+    LinearLayout tapactionlayout;
+    View bottomSheet;
     public static  final int RequestCode = 101;
     Location myLocation;
-    Button btnParking, btnMyLocation,btnFind,btnDrivers;
+    ImageView imgDriver,imgParking, imgGarage, imgMylocation;
+    ImageView imgTraffic,imgSetting;
 
     SessionManager sessionManager;
     private List<Marker> originMarkers = new ArrayList<>();
@@ -67,26 +90,87 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private ProgressDialog progressDialog;
 
     ArrayList<LatLng> lists;
-    private BottomSheetBehavior bottomSheetBehavior;
 
+
+    private void findId(){
+        floatingActionButton = (FloatingActionButton) findViewById(R.id.fab);
+        tapactionlayout = findViewById(R.id.tap_action_layout);
+        bottomSheet = findViewById(R.id.bottom_sheet1);
+        bottomSheetBehavior = BottomSheetBehavior.from(bottomSheet);
+        bottomSheetBehavior.setPeekHeight(120);
+        bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+        bottomSheetBehavior.setBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
+            @Override
+            public void onStateChanged(@NonNull View view, int i) {
+                if(i == BottomSheetBehavior.STATE_COLLAPSED){
+                    tapactionlayout.setVisibility(view.VISIBLE);
+                }
+
+                if (i == BottomSheetBehavior.STATE_EXPANDED) {
+                    tapactionlayout.setVisibility(View.GONE);
+                }
+
+                if (i == BottomSheetBehavior.STATE_DRAGGING) {
+                    tapactionlayout.setVisibility(View.GONE);
+                }
+            }
+
+            @Override
+            public void onSlide(@NonNull View view, float v) {
+
+            }
+        });
+        tapactionlayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(bottomSheetBehavior.getState()==BottomSheetBehavior.STATE_COLLAPSED)
+                {
+                    bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+                }
+            }
+        });
+//        // Find the toolbar view inside the activity layout
+//        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+//        // Sets the Toolbar to act as the ActionBar for this Activity window.
+//        // Make sure the toolbar exists in the activity and is not null
+//        setActionBar(toolbar);
+//        getActionBar().setHomeButtonEnabled(true);
+//        getActionBar().setDisplayHomeAsUpEnabled(true);
+//        getActionBar().setHomeAsUpIndicator(R.drawable.ic_menu_black_24dp);
+//        getActionBar().setTitle("Search here");
+
+        floatingActionButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                sessionManager.setLoginState(false);
+                startActivity(new Intent(MapsActivity.this,SignIn.class));
+            }
+        });
+    }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
+        // Obtain the SupportMapFragment and get notified when the map is ready to be used.
+        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
+                .findFragmentById(R.id.map);
+        //library to get myself location
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
-
         sessionManager = new SessionManager(this);
-
-        if(initMap()){
-          Toast.makeText(this,"ready to map",Toast.LENGTH_SHORT).show();
-      }
+        findId();
+        //init map
+        if(initMap()) {
+            Toast.makeText(this, "ready to map", Toast.LENGTH_SHORT).show();
+        }
         sendRequest();
-        View nestedScrollView = findViewById(R.id.nestedScrollView);
-        bottomSheetBehavior = BottomSheetBehavior.from(nestedScrollView);
+
     }
 
     private void sendRequest() {
-        new DirectionFinder(this, "My location","Parking location");
+        if(imgParking.isClickable()){
+            new DirectionFinder(this, "My location",parking.getName().toString().trim());
+        }
+
     }
     private boolean initMap() {
         if(mMap == null){
@@ -122,38 +206,83 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public void onMapReady(final GoogleMap googleMap) {
 
         mMap = googleMap;
-        btnDrivers = findViewById(R.id.btnDrivers);
-        btnParking = findViewById(R.id.btnParkings);
-        btnMyLocation = findViewById(R.id.btnmyLocation);
-//
+        imgDriver = findViewById(R.id.imgDriver);
+        imgParking = findViewById(R.id.imgParking);
+        imgMylocation = findViewById(R.id.imgMyLocation);
+        imgGarage = findViewById(R.id.imgGarage);
+        imgTraffic = findViewById(R.id.imgTraffic);
+        imgSetting = findViewById(R.id.setting);
 
-        btnMyLocation.setOnClickListener(new View.OnClickListener() {
+        imgSetting.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                getLastLocation();
+
             }
         });
-
-        btnDrivers.setOnClickListener(new View.OnClickListener() {
+        imgDriver.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 GetDriver();
+                bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
             }
         });
-        btnParking.setOnClickListener(new View.OnClickListener() {
+
+        imgParking.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 createMarkers();
-//                LatLng latLng = new LatLng(10.737696, 106.665194);
-//                mMap.addMarker(new MarkerOptions()
-//                        .position(latLng)
-//                        .title("garage"));
-             //   polyline();
-
+                bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+////                LatLng latLng = new LatLng(10.737696, 106.665194);
+////                mMap.addMarker(new MarkerOptions()
+////                        .position(latLng)
+////                        .title("garage"));
+//             //   polyline();
             }
         });
-        mMap.setTrafficEnabled(true);
+        imgMylocation.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                getLastLocation();
+                bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+            }
+        });
+
+        imgTraffic.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(mMap.isTrafficEnabled()){
+                    Toast.makeText(MapsActivity.this,"Traffic Information already",Toast.LENGTH_SHORT).show();
+                    bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+                }
+                else{
+                    mMap.setTrafficEnabled(true);
+                    bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+                }
+            }
+        });
     }
+
+
+    private void requestPermission() {
+
+        ActivityCompat.requestPermissions(MapsActivity.this, new String[]
+                {
+                        Manifest.permission.ACCESS_FINE_LOCATION,
+                        Manifest.permission.ACCESS_COARSE_LOCATION
+                }, RequestCode);
+
+    }
+
+
+    protected synchronized void buildGoogleApiClient() {
+        mGoogleApiClient = new GoogleApiClient.Builder(this)
+                .addConnectionCallbacks(this)
+                .addOnConnectionFailedListener(this)
+                .addApi(LocationServices.API)
+                .build();
+        mGoogleApiClient.connect();
+    }
+
 
     private void GetDriver(){
         RequestQueue requestQueue = Volley.newRequestQueue(MapsActivity.this);
@@ -172,6 +301,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                             LatLng latLng = new LatLng(lat,lng);
                             Marker marker = mMap.addMarker(new MarkerOptions()
                                     .position(latLng)
+                                    .draggable(true) //Making the marker draggable
                                     .title(name)
                                     .icon(BitmapDescriptorFactory.fromResource(R.drawable.automobile))
                                     .snippet(license));
@@ -211,6 +341,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                             LatLng latLng = new LatLng(lat,lng);
                             Marker marker = mMap.addMarker(new MarkerOptions()
                                     .position(latLng)
+                                    .draggable(true) //Making the marker draggable
                                     .title(String.valueOf(price)+"$")
                                     .icon(BitmapDescriptorFactory.fromResource(R.drawable.icon_park))
                                     .snippet(name));
@@ -302,6 +433,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         for (Route route : routes) {
             mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(route.startLocation, 16));
+            ((TextView) findViewById(R.id.tvDuration)).setText(route.duration.text);
+            ((TextView) findViewById(R.id.tvDistance)).setText(route.distance.text);
+            String ShipMoney = route.distance.text.trim().replaceAll("[^\\d]", "");
             originMarkers.add(mMap.addMarker(new MarkerOptions()
                     .icon(BitmapDescriptorFactory.defaultMarker())
                     .title(route.startAddress)
@@ -321,5 +455,45 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
             polylinePaths.add(mMap.addPolyline(polylineOptions));
         }
+    }
+
+    @Override
+    public void onConnected(@Nullable Bundle bundle) {
+
+    }
+
+    @Override
+    public void onConnectionSuspended(int i) {
+
+    }
+
+    @Override
+    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+
+    }
+
+    @Override
+    public void onPointerCaptureChanged(boolean hasCapture) {
+
+    }
+
+    @Override
+    public void onMapLongClick(LatLng latLng) {
+
+    }
+
+    @Override
+    public void onMarkerDragStart(Marker marker) {
+
+    }
+
+    @Override
+    public void onMarkerDrag(Marker marker) {
+
+    }
+
+    @Override
+    public void onMarkerDragEnd(Marker marker) {
+
     }
 }

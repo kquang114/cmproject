@@ -20,9 +20,9 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         sessionManager = new SessionManager(this);
-
-        sessionManager.setLoginState(false);
-
+        if(sessionManager.getLoginState()){
+            startActivity(new Intent(MainActivity.this,MapsActivity.class));
+        }
         findId();
         btnXacNhan.setOnClickListener(new View.OnClickListener() {
             @Override

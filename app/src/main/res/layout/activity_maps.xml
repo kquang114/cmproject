@@ -5,73 +5,159 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_height="match_parent"
-    android:layout_width="match_parent"
-    tools:context=".MapsActivity">
+    android:layout_width="match_parent">
 
-    <LinearLayout
-        android:gravity="center"
-        android:layout_weight="1"
+    <androidx.drawerlayout.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:sothree="http://schemas.android.com/tools"
+        android:id="@+id/drawer_layout"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:layout_height="match_parent">
 
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="My Location"
-            android:layout_marginRight="50dp"
-            android:id="@+id/btnmyLocation"/>
-
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Driver"
-            android:id="@+id/btnDrivers"/>
-
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Garages"
-            android:id="@+id/btnParkings" />
-
-    </LinearLayout>
-
-    <fragment xmlns:android="http://schemas.android.com/apk/res/android"
-        android:id="@+id/map"
-        android:name="com.google.android.gms.maps.SupportMapFragment"
-        android:layout_width="match_parent"
-        android:layout_height="600dp"
-        android:layout_marginTop="@dimen/dimen_50" />
-
-    <android.support.v4.widget.NestedScrollView
-        android:id="@+id/nestedScrollView"
-        android:layout_width="match_parent"
-        android:layout_height="300dp"
-        android:background="@android:color/holo_green_light"
-        android:clipToPadding="true"
-        app:behavior_hideable="true"
-        app:behavior_peekHeight="60dp"
-        app:layout_behavior="@string/bottom_sheet_behavior">
-
-        <LinearLayout
+        <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:orientation="vertical"
-            android:padding="10dp">
+            android:orientation="vertical">
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textColor="@android:color/white"
-                android:textSize="24sp" />
+            <androidx.coordinatorlayout.widget.CoordinatorLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:textColor="@android:color/white" />
-        </LinearLayout>
+                <com.google.android.material.appbar.AppBarLayout
+                    android:id="@+id/appbar"
+                    android:padding="15dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:minHeight="?attr/actionBarSize"
+                    android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+                    android:background="@android:color/transparent">
 
-    </android.support.v4.widget.NestedScrollView>
+                    <LinearLayout
+                        android:gravity="center"
+                        android:layout_weight="1"
+                        android:layout_width="match_parent"
+                        android:layout_height="0dp"
+                        android:orientation="horizontal">
+                        <ImageView
+                            android:layout_marginLeft="20dp"
+                            android:layout_width="30dp"
+                            android:layout_height="30dp"
+                            android:src="@drawable/ic_distance"/>
+                        <TextView
+                            android:textColor="@color/colorTextView"
+                            android:layout_marginLeft="5dp"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="0 km"
+                            android:id="@+id/tvDistance" />
+
+                        <ImageView
+                            android:layout_marginLeft="5dp"
+                            android:layout_width="30dp"
+                            android:layout_height="30dp"
+                            android:padding="5dp"
+                            android:src="@drawable/ic_clock"/>
+                        <TextView
+                            android:textColor="@color/colorTextView"
+                            android:layout_marginLeft="5dp"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="0 min"
+                            android:id="@+id/tvDuration" />
+                        <ImageView
+                            android:layout_marginLeft="5dp"
+                            android:layout_width="30dp"
+                            android:layout_height="30dp"
+                            android:padding="5dp"
+                            android:src="@drawable/moneydollar"/>
+                        <TextView
+                            android:textColor="@color/colorTextView"
+                            android:layout_marginLeft="5dp"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="0 VNĐ"
+                            android:id="@+id/tvShip" />
+                    </LinearLayout>
+                    <!--<Toolbar-->
+                        <!--android:id="@+id/toolbar"-->
+                        <!--android:layout_height="?attr/actionBarSize"-->
+                        <!--app:layout_collapseMode="pin"-->
+                        <!--android:minHeight="?attr/actionBarSize"-->
+                        <!--android:layout_width="match_parent"-->
+                        <!--app:titleTextColor="@color/grey"-->
+                        <!--android:background="@android:color/white"-->
+                        <!--app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"-->
+                        <!--app:popupTheme="@style/ThemeOverlay.AppCompat.Light">-->
+
+                    <!--</Toolbar>-->
+
+                </com.google.android.material.appbar.AppBarLayout>
+
+
+                <fragment
+                    android:id="@+id/map"
+                    android:name="com.google.android.gms.maps.SupportMapFragment"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    sothree:context=".MapsActivity" />
+
+
+                <com.google.android.material.floatingactionbutton.FloatingActionButton
+                    android:id="@+id/fab"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:elevation="6dp"
+                    app:pressedTranslationZ="12dp"
+                    app:layout_anchor="@id/map"
+                    android:layout_marginLeft="16dp"
+                    android:layout_marginRight="16dp"
+                    android:layout_marginBottom="66dp"
+                    app:backgroundTint="#ffffff"
+                    android:src="@drawable/logout"
+                    app:layout_anchorGravity="bottom|right|end">
+
+                </com.google.android.material.floatingactionbutton.FloatingActionButton>
+
+            </androidx.coordinatorlayout.widget.CoordinatorLayout>
+
+        </FrameLayout>
+
+    </androidx.drawerlayout.widget.DrawerLayout>
+
+    <include layout="@layout/bottomsheet_layout"></include>
+
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
+<!--<LinearLayout-->
+<!--android:gravity="center"-->
+<!--android:layout_weight="1"-->
+<!--android:layout_width="match_parent"-->
+<!--android:layout_height="wrap_content"-->
+<!--android:orientation="horizontal">-->
+
+<!--<Button-->
+    <!--android:layout_width="wrap_content"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:text="My Location"-->
+    <!--android:layout_marginRight="50dp"-->
+    <!--android:id="@+id/btnmyLocation"/>-->
+
+<!--<Button-->
+    <!--android:layout_width="wrap_content"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:text="Driver"-->
+    <!--android:id="@+id/btnDrivers"/>-->
+
+<!--<Button-->
+    <!--android:layout_width="wrap_content"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:text="Garages"-->
+    <!--android:id="@+id/btnParkings" />-->
+
+<!--</LinearLayout>-->
+
+<!--<fragment xmlns:android="http://schemas.android.com/apk/res/android"-->
+<!--android:id="@+id/map"-->
+<!--android:name="com.google.android.gms.maps.SupportMapFragment"-->
+<!--android:layout_width="match_parent"-->
+<!--android:layout_height="match_parent"/>-->
